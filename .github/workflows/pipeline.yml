@@ -8,6 +8,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
+
   avoid_reduncy:
     runs-on: ubuntu-18.04
     steps:
@@ -19,7 +20,7 @@ jobs:
   lint:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
@@ -29,12 +30,11 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run eslint
-      - name: Build
 
-  build: 
+  build:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
@@ -53,7 +53,7 @@ jobs:
     needs: [lint, build]
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
@@ -66,13 +66,13 @@ jobs:
           name: dist
           path: dist
       - name: Test
-        run: npm run test
+        run: npm test
 
   e2e:
     needs: [lint, build]
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
@@ -84,24 +84,23 @@ jobs:
         with:
           name: dist
           path: dist
-      - name: E2E test
+      - name: E2E tests
         uses: cypress-io/github-action@v2
         with:
           command: npm run test:e2e
           start: npm run start-test
-          wait-on: http://localhost:5000/
-          browser: chrome
+          wait-on: http://localhost:5000
 
   deploy:
     needs: [test, e2e]
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Deploy to Heroku
         if: ${{ github.event_name == 'push' }}
-        uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP}}
